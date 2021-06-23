@@ -1,0 +1,40 @@
+BTree se fundamenta em um arquivo de indices do tipo:
+
+
+13234|(vazio)                                				// <<<<- header contendo o offset do root
+3|a b c|123823 7236512 1928391|321 736 830 172|0|(espaço vazio)	// <<<<- nó de índice (não tem o 'pipe' nem os espaços): 
+
+// quantidade de registros|IDs em sequencia|offset no reg.dat|offset dos filhos|flag 'é folha?'|(vazio)
+// TODAS as 'páginas' contêm o mesmo tamanho (PAGE_SIZE)
+
+
+as primeiras inserções ocorrem na raiz, e é adicionada até estourar
+//quantidade de chaves até estourar: 204
+
+
+INSERÇÕES
+A fução deve inserir sempre em uma folha (seguindo a ordenação) até não conseguir mais.
+Quando isso acontece, ocorre a divisão da folha no meio:
+uma folha com os menores IDs, a 'promoção' do menor dos elementos da folha dos maiores IDs
+o elemento promovido passa a fazer parte do nó pai da folha que ele veio
+
+caso 1:
+	insere num nó FOLHA que não ultrapassou o PAGE_SIZE. 
+caso 2:
+	quando estoura, duas novas folhas são criadas. (chamar função split)
+	Um dos IDs é promovido (ou seja, ele sobe um nível,
+		o filho à esquerda é a nova folha dos menores IDs, 
+			o filho à direita é a nova folha dos maiores IDs)
+caso 3:
+	a Raiz estoura, um novo nível deve ser criado, o byte_offset do header precisa ser atualizado
+	// é um caso mais específico do anterior, dá pra fazer uma verificação simples ao invés
+	// de fazer 3 casos distintos
+
+
+BUSCAS
+A função recebe um ID, e procura no btree.dat a partir do offset indicado no header;
+lê a primeira entrada pra saber quantos registros tem no nó;
+inicia uma struct nó com (malloc) e coloca cada ID e seus respectivos filhos;
+se o ID buscado não está neste nó, procura no filho provável;
+
+
